@@ -1,3 +1,8 @@
+allowBuilds:
+  contentlayer: true
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true
 onlyBuiltDependencies:
   - contentlayer
   - esbuild
