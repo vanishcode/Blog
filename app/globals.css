@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f5f5f3;
+  --bg-panel: #ffffff;
+  --text: #101214;
+  --muted: #5e646b;
+  --accent: #2c7a57;
+  --accent-strong: #246647;
+  --border: #d6d9dd;
+  --shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  --bg: #111214;
+  --bg-panel: #16181b;
+  --text: #e7e7e4;
+  --muted: #a0a6ad;
+  --accent: #6fb38a;
+  --accent-strong: #5aa178;
+  --border: #2b2f36;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-strong);
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.divider {
+  border-top: 1px solid var(--border);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  font-weight: 500;
+}
+
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
+  content: "";
+}
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.prose :where(pre code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* rehype-pretty-code: dual-theme syntax highlighting */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+.prose :where(code[data-line-numbers]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  counter-reset: line;
+}
+
+.prose :where(code[data-line-numbers] > [data-line]):not(:where([class~="not-prose"], [class~="not-prose"] *))::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1.5rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: var(--muted);
+}
+
+.prose :where(figure[data-rehype-pretty-code-figure]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  margin: 0;
+}
+
+.prose :where(figcaption[data-rehype-pretty-code-title]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  color: var(--muted);
+}
+
+.prose :where(code[data-line]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  display: block;
+  padding: 0 1rem;
+}
+
+.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-left-color: var(--accent);
+  color: var(--muted);
+}
+
+.prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-color: var(--border);
+}
+
+.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--text);
+}

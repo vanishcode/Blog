@@ -1,0 +1,214 @@
+---
+title: Cosmos & Keplr 手续费调研
+description: fee
+date: 2024-05-23
+---
+
+> 调研 keplr 插件钱包的实现
+https://github.com/chainapsis/keplr-wallet
+https://chrome.google.com/webstore/detail/dmkamcknogkgcdfhhbddcghachkejeap
+
+# 手续费
+## Fee
+### 公式
+fee = gasPrice * gasAmount  例如：
+- 0.002585 = 0.03 * 86142
+- 66263 * 1.3 = 86142
+
+![1280X1280](https://github.com/vanishcode/Blog/assets/20496444/fcef851c-0bb3-4a39-9170-29f70b0f7cda)
+
+## Gas Price
+### 默认值
+有最小兜底，以及每条链都配置了默认的 gas price 值（注意这里并不是最小单位）
+![1280X1280 (1)](https://github.com/vanishcode/Blog/assets/20496444/e1aaff00-75e1-4a1d-b4a1-13a231e0cc3f)
+### 代码
+https://github.com/chainapsis/keplr-wallet/blob/c3ca3a8f29d3a04c334b3d4b696b8c7ed1a48806/packages/extension/src/config.ts#L1180
+### 远端配置
+都在这个仓库里
+举例：https://github.com/chainapsis/keplr-chain-registry/blob/main/cosmos/injective.json
+
+![a580fda2-e838-4a38-b4b9-de0248eea6d9](https://github.com/vanishcode/Blog/assets/20496444/63b5475e-cf92-402c-b6b9-754fd127c890)
+![a580fda2-e838-4a38-b4b9-de0248eea6d9](https://github.com/vanishcode/Blog/assets/20496444/d0084883-c2a5-4a92-8746-94f91e67b6fb)
+
+
+## Gas Amount
+### 值设置
+可以是数量或者倍数，有默认值，填完发送地址和额度显示预估值
+![1f320bc9-a366-46ba-a360-95b1fab93d86](https://github.com/vanishcode/Blog/assets/20496444/2fce2de4-50c4-4761-b1cb-01a7eba85bb6)
+![fa744436-f956-467e-a917-debf747c161d](https://github.com/vanishcode/Blog/assets/20496444/79e9e57f-d3ee-4a56-9d26-9e919daaa45f)
+
+代码中有些地方也设置了默认值，不同链不一样。接口有问题的时候会用默认值。（但是这些默认配置也会更新，根据 github 上配的 chain info，更新频率很低）
+
+![9c3e0b76-c1f5-4776-95e4-6b7e3fa7d3b1](https://github.com/vanishcode/Blog/assets/20496444/9341e600-f4ee-4a44-b329-ed0a055a7274)
+
+### 放大倍数
+Gas Adjustment 代码中默认设置 1.3
+
+![feb7a7e5-8474-47f2-98bf-63ff7d48f415](https://github.com/vanishcode/Blog/assets/20496444/9f4670dd-4476-4d96-9f3c-f015184d435c)
+
+![8f26c1bf-1ddb-48d0-9f0b-e6325a3f5e17](https://github.com/vanishcode/Blog/assets/20496444/4335e920-d8cd-48e5-913d-176c66f377ff)
+
+**注意 ⚠️ 这里的值是预执行返回的 gas amount 然后乘这个 1.3 系数（因为可能有小数，因此要取整，如 2.25 要等于 2.3，不能取 2.2，会不够）**
+![e6a4f9df-46bf-4c57-97aa-6ab7275ad5a2](https://github.com/vanishcode/Blog/assets/20496444/fbc4d952-2208-4003-9496-23d8116801bd)
+
+但是，这个放大值只允许在 0 和 2 之间
+
+![bd1b77cd-b206-4bab-b33e-701367a86aa5](https://github.com/vanishcode/Blog/assets/20496444/b009ac91-04d3-4f71-805d-e0ff9092471b)
+
+# 预估
+## 预执行交易数据格式
+并不需要签名，将交易信息传过来，签名部分搞一个空的参数即可
+https://github.com/chainapsis/keplr-wallet/blob/244dc1930ae92ff5afcc0a7f079d35a0c774af6a/packages/stores/src/account/cosmos.ts#L711
+```js
+ const unsignedTx = TxRaw.encode({
+  bodyBytes: TxBody.encode(
+    TxBody.fromPartial({
+    // 这里是交易信息
+      messages: msgs,
+      memo: memo,
+    })
+  ).finish(),
+  authInfoBytes: AuthInfo.encode({
+    signerInfos: [
+      SignerInfo.fromPartial({
+        // Pub key is ignored.
+        // It is fine to ignore the pub key when simulating tx.
+        // However, the estimated gas would be slightly smaller because tx size doesn't include pub key.
+        modeInfo: {
+          single: {
+            mode: SignMode.SIGN_MODE_LEGACY_AMINO_JSON,
+          },
+          multi: undefined,
+        },
+        sequence: account.getSequence().toString(), // 这里需要按照实际传
+      }),
+    ],
+    fee: Fee.fromPartial({
+      amount: fee.amount.map((amount) => {
+        return { amount: amount.amount, denom: amount.denom };  // 这里不能为空，但是取之前的接口给的默认值就行
+      }),
+    }),
+  }).finish(),
+  // Because of the validation of tx itself, the signature must exist.
+  // However, since they do not actually verify the signature, it is okay to use any value.
+  // 搞个空的 array buffer 就可以，因为用不到
+  signatures: [new Uint8Array(64)],
+}).finish();
+```
+
+## 预执行交易数据组装
+```js
+// 质押
+messages: [
+  {
+    typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
+    value: MsgDelegate.encode({
+      delegatorAddress:
+        'celestia1u6lts9ng4etxj0zdaxsada6zgl8dudpgqweugr',
+      validatorAddress:
+        'celestiavaloper1v5hrqlv8dqgzvy0pwzqzg0gxy899rm4klzxm07',
+      amount: Coin.fromPartial({ denom: 'utia', amount: '100000' }),
+    }).finish(),
+  },
+],
+```
+
+```js
+// 普通发币        
+messages: [
+  {
+    typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+    value: MsgSend.encode({
+      fromAddress: from,
+      toAddress: to,
+      amount: [
+        {
+          denom,
+          amount,
+        },
+      ],
+    }).finish(),
+  },
+],
+```
+
+**其他消息类型类似，通过对应的消息类型编码为 uint8array 格式。如：https://github.com/osmosis-labs/osmosis-frontend/blob/8d636982aeaf50593cd97f6c37c916062dbd0cde/packages/proto-codecs/src/codegen/osmosis/poolmanager/v1beta1/tx.amino.ts**
+
+## 插件钱包 API 与手续费预估
+
+而普通的 JSON / amino 格式，除非知道特定的消息的结构，也就是 encode 的对象，才能转换为 uint8 格式，因此，市面上绝大多数钱包，对于调用 signAmino 方法的交易，直接使用 JSON 数据里的手续费，不做校验和替换
+- signAmino 签名 JSON 格式交易数据：使用较少，是历史遗留方法，目前 osmosis 官方 DApp 在用，但是他们会用自己的费用数据（设置 preferNoSetFee）所以并不需要预估
+- signDirect 签名 Uint8Array 格式交易数据：使用较多，是新方法，新 DApp 基本都为此方法
+
+关于格式转换可以从此 pr 入手了解： 
+https://github.com/okx/js-wallet-sdk/pull/96
+
+## 接口调用
+带假 signatures 的交易的 base64 格式串：
+```js
+const result = await simpleFetch<any>(
+  this.chainGetter.getChain(this.chainId).rest,
+  "/cosmos/tx/v1beta1/simulate",
+  {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      tx_bytes: Buffer.from(unsignedTx).toString("base64"),
+    }),
+  }
+);
+
+const gasUsed = parseInt(result.data.gas_info.gas_used);
+if (Number.isNaN(gasUsed)) {
+  throw new Error(`Invalid integer gas: ${result.data.gas_info.gas_used}`);
+}
+```
+
+Curl 调用例子：
+```shell
+curl 'https://lcd-cosmoshub.keplr.app/cosmos/tx/v1beta1/simulate' \
+  -H 'authority: lcd-cosmoshub.keplr.app' \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'pragma: no-cache' \
+  -H 'sec-ch-ua: "Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' \
+  --data-raw '{"tx_bytes":"CpEBCo4BChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEm4KLWNvc21vczF1Nmx0czluZzRldHhqMHpkYXhzYWRhNnpnbDhkdWRwZzN5Z3ZqdxItY29zbW9zMWN5NzVrZXVzYTM5Z2Q1OTZrOHMyNHhkMnl4NTVnZ2dhNzU0Z3V4Gg4KBXVhdG9tEgUxMDAwMBIbCggSBAoCCH8YYBIPCg0KBXVhdG9tEgQyMTUzGkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}' \
+  --compressed
+```
+返回，用到的就是 gas_info 下的 gas_used 字段（然后还要乘 1.3）：
+```json
+{
+  "gas_info": {
+    "gas_wanted": "1300000",
+    "gas_used": "66263"
+  },
+  "result": {
+    "data": "Ch4KHC9jb3Ntb3MuYmFuay52MWJldGExLk1zZ1NlbmQ=",
+    "log": "[{\"events\":[{\"type\":\"coin_received\",\"attributes\":[{\"key\":\"receiver\",\"value\":\"cosmos1cy75keusa39gd596k8s24xd2yx55ggga754gux\"},{\"key\":\"amount\",\"value\":\"10000uatom\"}]},{\"type\":\"coin_spent\",\"attributes\":[{\"key\":\"spender\",\"value\":\"cosmos1u6lts9ng4etxj0zdaxsada6zgl8dudpg3ygvjw\"},{\"key\":\"amount\",\"value\":\"10000uatom\"}]},{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"/cosmos.bank.v1beta1.MsgSend\"},{\"key\":\"sender\",\"value\":\"cosmos1u6lts9ng4etxj0zdaxsada6zgl8dudpg3ygvjw\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1cy75keusa39gd596k8s24xd2yx55ggga754gux\"},{\"key\":\"sender\",\"value\":\"cosmos1u6lts9ng4etxj0zdaxsada6zgl8dudpg3ygvjw\"},{\"key\":\"amount\",\"value\":\"10000uatom\"}]}]}]",
+    "events": [
+      {
+        "type": "message",
+        "attributes": [
+          {
+            "key": "YWN0aW9u",
+            "value": "L2Nvc21vcy5iYW5rLnYxYmV0YTEuTXNnU2VuZA==",
+            "index": false
+          }
+        ]
+      },
+      // ............. 省略
+    ]
+  }
+}
+```
+https://docs.junonetwork.io/developer-guides/api-endpoints/cosmos/tx/v1beta1/simulate
+这里有 JUNO 的文档，可以参考

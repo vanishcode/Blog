@@ -1,0 +1,97 @@
+---
+title: Resume
+description: resume
+date: 2026-06-15
+---
+
+# 王景昊 - Senior Software Engineer
+
+## 基本信息
+
+- **1998 年生 · 2019 届本科 · 7 年工作经验（2019 - 2026）**
+- **手机**：+86 17863136036　**邮箱**：[vanishcode@outlook.com](mailto:vanishcode@outlook.com)
+- **GitHub**：[github.com/vanishcode](https://github.com/vanishcode)　**技术博客**：[vanishcode.com](https://vanishcode.com)
+
+## 教育经历
+
+**2015 - 2019　哈尔滨工业大学**　计算机科学与技术学院 · 信息安全专业
+
+## 工作经历
+
+### MegaETH · Product Team ｜ Senior Software Engineer（2025.04 - 至今）
+
+**[Moss Wallet](https://account.megaeth.com)**
+
+Web-embedded Smart Account Wallet（EIP-4337 + EIP-7702）对标 Privy，支持 Passkey、交易自动确认、gas 代付
+
+- 实现钱包前端核心逻辑：7702 升级、gas 计算、calldata 组装
+  - [@megaeth-labs/wallet-intent](https://www.npmjs.com/package/@megaeth-labs/wallet-intent)
+- 实现 gas sponsor（三方代付）服务
+  - [@megaeth-labs/wallet-merchant](https://www.npmjs.com/package/@megaeth-labs/wallet-merchant)
+- 开发并维护钱包连接相关 SDK
+  - [@megaeth-labs/wallet-sdk](https://www.npmjs.com/package/@megaeth-labs/wallet-sdk)
+  - [@megaeth-labs/wallet-sdk-react](https://www.npmjs.com/package/@megaeth-labs/wallet-sdk-react)
+  - [@megaeth-labs/wallet-wagmi-connector](https://www.npmjs.com/package/@megaeth-labs/wallet-wagmi-connector)
+  - @megaeth-labs/viem-extension
+- 参与开发部分后端，基于 Hono 框架，实现登录（SIWE）、备份等功能
+- 支持 MegaETH 链，兼容以太坊等 EVM 多链；已被 [PrismFi](https://prismfi.cc/swap)、[TopStrike](https://play.topstrike.io/) 等项目方集成接入，覆盖 10000+ 用户
+
+**Mega Wallet**
+
+支持隐私转账的全平台多链钱包客户端（基于 Railgun）
+
+- 独立实现技术基础设施完整链路：账户、网络、交易、DApp，以及构建、打包、发布
+- 多端交付：Expo（iOS & Android）移动端 + Electron 桌面端
+
+**Token Sale — MegaETH ICO DApp**
+
+- [sale.megaeth.com](https://product-token-sale.vercel.app/)：基于 Sonar 的代币销售平台，**拍卖规模约 10 亿美元、参与地址数万级**；负责代币信息、退款、赎回模块 UI 还原及逻辑，并配合后端工程师完成数据统计
+- [token.megaeth.com](https://mega-token-sale.vercel.app/)：代币信息站，UI 更新与性能优化
+
+**生态项目方协助**
+
+协助 MegaETH 生态项目方 DApp 全栈开发，包括 UI 组件开发、逻辑优化、网站性能优化、KYC 流程开发等
+
+- **[Dorado Lobby](https://doradogames.xyz/)**
+- **[Golden Ghost](https://golden-ghost.doradogames.xyz/)**
+
+### OKX · Web3 Wallet ｜ Senior Front-End Engineer（2021.12 - 2025.04）
+
+**[插件钱包](https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge/)**
+
+- 从 0 参与并持续深耕钱包3 年，深度覆盖账户、转账、交易、DApp 连接/管理、交易历史等全部核心模块
+- 熟悉各链账户模型、交易组装与 DApp 合约交互细节
+- 熟悉浏览器插件钱包架构与构建、上架等开发测试发布全流程
+
+**MPC 钱包模块**
+
+- 参与方案调研，覆盖密钥分片生成、分片管理、签名交互与账户恢复
+- 负责前端工程落地：钱包侧签名模块开发（底层调用 SDK）、签名交互 UI 还原
+- 负责与 CeFi 团队及底层 SDK 签名组的技术对接与联调验证
+
+**DEX & Market**
+
+- 维护 [DEX](https://web3.okx.com/dex-swap) Swap / Bridge 功能，熟悉各链交易流程及细节，如 MEV、滑点算法等
+- 维护 [Market](https://web3.okx.com/token) 首页行情及交易面板
+
+**生态接入与开源贡献**
+
+- 作为技术支持对接国内外 **50+** 项目方社群（Morph、Sushi、MagicEden、Tron 等）接入钱包
+- 开发、维护多个钱包 connector / adapter: [web3-onboard](https://github.com/blocknative/web3-onboard/pull/2229)、[rainbowkit](https://github.com/rainbow-me/rainbowkit/pull/1107)、[dialect blinks](https://github.com/dialectlabs/blinks/pull/12/commits)、[okwallet-aptos-wallet-adapter](https://github.com/vanishcode/okwallet-aptos-wallet-adapter)、[okx-wallet-solana-adapter](https://github.com/vanishcode/okx-wallet-solana-adapter)、[okx-wallet-connector](https://github.com/vanishcode/okx-wallet-connector)
+- 自研多链测试 DApp: [multichain-test-dapp](https://multichain-test-dapp-git-main-vanishcode.vercel.app)
+
+### 早期经历（2019 - 2021）
+
+- **百度 · 手机百度 ｜ 高级前端开发工程师**（2021.06 - 2021.11）：维护百度自研前端工具链（[san](https://github.com/baidu/san/) / san-router / san-loader / rollup-plugin-san / san-jest），覆盖首页等核心业务线；维护百度 App 性能监控平台
+- **360 · 前端技术部 ｜ 前端开发工程师**（2019.11 - 2021.06）：参与 360 安全卫士（软件管家、健康精灵等 Hybrid App）研发；维护 360 系列产品官网（卫士、杀毒、压缩等）及 360 智能云平台
+
+## 自我评价
+
+- **AI 工程化**：擅长从 0 到 1 接手项目并快速落地；熟悉 harness engineering, 善于把 AI 嵌入从需求到测试全流程
+- **主动性**：善于发现并补全项目与产品的不足，推动技术方案优化
+- **技术投入**：关注区块链行业技术热点，对钱包、DEX 等基础设施持续投入
+
+## 职位意向
+
+- **区块链钱包开发**：MPC / 自托管钱包 · Browser Extension · React Native / Expo · Electron · Web
+- **区块链 DApp 开发**：多链 DApp / DEX / DeFi 基础设施

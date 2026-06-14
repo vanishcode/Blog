@@ -1,0 +1,10 @@
+---
+title: react-native-webview 引入本地 html
+description: expo
+date: 2025-07-10
+---
+在 expo 中使用 react-native-webview 库可以随便引入一个外部链接，如果引入本地的 html，单个 html（无 js css标签引入）还好，像 webpack 打包出来的，就会报 not in assetExts
+
+xcode 设置：拖动文件夹，设置 “apply once to folder”关联 app
+
+android 一般不需要设置，可以 android studio gradle sync一下
