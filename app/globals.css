@@ -2,26 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------ *
+ * Drake "vue" theme (github.com/liangjingkanji/DrakeTyporaTheme)
+ * Light = the authentic Drake vue palette; dark = a faithful adaptation.
+ * ------------------------------------------------------------------ */
 :root {
-  --bg: #f5f5f3;
+  --bg: #ffffff;
   --bg-panel: #ffffff;
-  --text: #101214;
-  --muted: #5e646b;
-  --accent: #2c7a57;
-  --accent-strong: #246647;
-  --border: #d6d9dd;
-  --shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  --text: #304455;        /* drake --text-color */
+  --title: #273849;       /* drake --title-color */
+  --muted: #6b7a85;       /* drake blurred slate */
+  --accent: #31a062;      /* drake --drake-accent (vue green) */
+  --accent-strong: #2a8b54;
+  --highlight: #d63200;   /* drake --drake-highlight (inline code red) */
+  --border: #dfe2e5;      /* drake --table-border-color */
+  --code-bg: #f8f8f8;     /* drake --code-block-bg-color */
+  --code-text: #525252;   /* drake --code-block-color */
+  --quote-bar: #ff6666;   /* drake --blockquote-border-color (#f66) */
+  --quote-bg: #f8f8f8;
+  --shadow: 0 1px 2px rgba(48, 68, 85, 0.06);
 }
 
 .dark {
-  --bg: #111214;
-  --bg-panel: #16181b;
-  --text: #e7e7e4;
-  --muted: #a0a6ad;
-  --accent: #6fb38a;
-  --accent-strong: #5aa178;
-  --border: #2b2f36;
-  --shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  --bg: #16191c;
+  --bg-panel: #1b1f24;
+  --text: #c4cfd8;
+  --title: #dde6ee;
+  --muted: #8a96a0;
+  --accent: #42b883;      /* brighter vue green for dark bg */
+  --accent-strong: #5fce9b;
+  --highlight: #ff7b5e;
+  --border: #2b3137;
+  --code-bg: #1f242a;
+  --code-text: #aab4bd;
+  --quote-bar: #ff6b6b;
+  --quote-bg: #1f242a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 body {
@@ -38,11 +54,16 @@ a:hover {
   color: var(--accent-strong);
 }
 
+h1, h2, h3, h4, h5, h6 {
+  color: var(--title);
+}
+
 .card {
   border: 1px solid var(--border);
   background: var(--bg-panel);
   box-shadow: var(--shadow);
-  padding: 20px;
+  border-radius: 2px;
+  padding: 24px 28px;
 }
 
 .divider {
@@ -53,6 +74,7 @@ a:hover {
   color: var(--muted);
 }
 
+/* ----------------- prose (rendered MDX) — Drake vue treatment ----------------- */
 .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   color: var(--accent);
   text-decoration: none;
@@ -63,11 +85,28 @@ a:hover {
   text-decoration: underline;
 }
 
+.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--title);
+}
+
+/* drake centres top-level headings (its signature resume/title look) */
+.prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-align: center;
+}
+
+.prose :where(strong):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--title);
+  font-weight: 700;
+}
+
+/* inline code — red on light grey, no border (drake #write code) */
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  padding: 1px 6px;
-  font-weight: 500;
+  color: var(--highlight);
+  background: var(--code-bg);
+  border: none;
+  padding: 3px 5px;
+  border-radius: 2px;
+  font-weight: 400;
 }
 
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
@@ -75,11 +114,12 @@ a:hover {
   content: "";
 }
 
+/* code block (drake .md-fences) */
 .prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  background: var(--bg-panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 0;
+  background: var(--code-bg);
+  color: var(--code-text);
+  border: none;
+  border-radius: 2px;
 }
 
 .prose :where(pre code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
@@ -88,7 +128,67 @@ a:hover {
   padding: 0;
 }
 
-/* rehype-pretty-code: dual-theme syntax highlighting */
+/* blockquote — coloured left bar + tinted panel (drake) */
+.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-left: 4px solid var(--quote-bar);
+  background: var(--quote-bg);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 2px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.prose :where(blockquote p:first-of-type):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
+.prose :where(blockquote p:last-of-type):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
+  content: "";
+}
+
+/* horizontal rule — solid title-coloured divider (drake) */
+.prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-top: 2px solid var(--title);
+}
+
+/* tables (drake) */
+.prose :where(thead):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: var(--code-bg);
+  border-bottom-color: var(--border);
+}
+
+.prose :where(thead th):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  color: var(--title);
+}
+
+.prose :where(th, td):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid var(--border);
+  padding: 6px 13px;
+}
+
+.prose :where(tbody tr:nth-child(2n)):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: var(--code-bg);
+}
+
+/* highlight / mark — pill outline (drake) */
+.prose :where(mark):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background: transparent;
+  color: var(--highlight);
+  border: 1px solid var(--highlight);
+  padding: 0.1rem 0.5rem;
+  border-radius: 2rem;
+}
+
+/* kbd (drake) */
+.prose :where(kbd):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border: 1px solid var(--muted);
+  background: transparent;
+  color: var(--text);
+  padding: 0.3em 0.4em;
+  border-radius: 0.4em;
+  box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3);
+}
+
+/* rehype-pretty-code: dual-theme syntax highlighting (keepBackground:false,
+   so the pre's --code-bg shows through and tokens only carry colour) */
 code[data-theme*=" "],
 code[data-theme*=" "] span {
   color: var(--shiki-light);
@@ -120,7 +220,7 @@ code[data-theme*=" "] span {
 }
 
 .prose :where(figcaption[data-rehype-pretty-code-title]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  background: var(--bg-panel);
+  background: var(--code-bg);
   border: 1px solid var(--border);
   border-bottom: none;
   padding: 6px 12px;
@@ -131,17 +231,4 @@ code[data-theme*=" "] span {
 .prose :where(code[data-line]):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   display: block;
   padding: 0 1rem;
-}
-
-.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  border-left-color: var(--accent);
-  color: var(--muted);
-}
-
-.prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  border-color: var(--border);
-}
-
-.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-  color: var(--text);
 }

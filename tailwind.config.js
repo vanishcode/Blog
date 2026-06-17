@@ -23,9 +23,11 @@ module.exports = {
         bg: "var(--bg)",
         panel: "var(--bg-panel)",
         ink: "var(--text)",
+        title: "var(--title)",
         muted: "var(--muted)",
         accent: "var(--accent)",
         "accent-strong": "var(--accent-strong)",
+        highlight: "var(--highlight)",
         line: "var(--border)",
       },
       borderRadius: {
